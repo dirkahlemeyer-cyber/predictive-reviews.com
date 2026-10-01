@@ -1,0 +1,1 @@
+{"cleanUrls":true,"rewrites":[{"source":"/impressum","destination":"/index.html"},{"source":"/faq","destination":"/index.html"},{"source":"/contact-us","destination":"/index.html"}]}

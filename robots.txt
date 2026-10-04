@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://predictive-reviews.com/sitemap.xml

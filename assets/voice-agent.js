@@ -1,29 +1,41 @@
-import { AgentSession, AgentMicrophone, AgentPlayer } from "https://esm.sh/@deepgram/agents@latest";
+import { AgentSession, AgentMicrophone, AgentPlayer } from "@deepgram/agents";
 
-const startButton = document.querySelector("[data-voice-start]");
-const stopButton = document.querySelector("[data-voice-stop]");
-const status = document.querySelector("[data-voice-status]");
-const transcript = document.querySelector("[data-voice-transcript]");
-const agentPanel = document.querySelector("[data-voice-agent]");
+const startButton = /** @type {HTMLButtonElement} */ (document.querySelector("[data-voice-start]"));
+const stopButton = /** @type {HTMLButtonElement} */ (document.querySelector("[data-voice-stop]"));
+const status = /** @type {HTMLElement} */ (document.querySelector("[data-voice-status]"));
+const transcript = /** @type {HTMLElement} */ (document.querySelector("[data-voice-transcript]"));
+const agentPanel = /** @type {HTMLElement} */ (document.querySelector("[data-voice-agent]"));
 
+if (!startButton || !stopButton || !status || !transcript || !agentPanel) {
+  throw new Error("Voice agent controls are missing from this page.");
+}
+
+/** @type {AgentSession | undefined} */
 let session;
+/** @type {AgentMicrophone | undefined} */
 let microphone;
+/** @type {AgentPlayer | undefined} */
 let player;
 
+/** @param {string} message @param {string} [state] */
 const setStatus = (message, state = "idle") => {
   status.textContent = message;
   status.dataset.state = state;
 };
 
+/** @param {string} role @param {string} content */
 const addTranscript = (role, content) => {
   if (!content) return;
   const item = document.createElement("p");
   item.className = `voice-line voice-line--${role}`;
-  item.innerHTML = `<strong>${role === "user" ? "Sie" : "Assistent"}:</strong> ${content.replace(/[&<>"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[char]))}`;
+  const label = document.createElement("strong");
+  label.textContent = `${role === "user" ? "Sie" : "Assistent"}: `;
+  item.append(label, document.createTextNode(content));
   transcript.append(item);
   transcript.scrollTop = transcript.scrollHeight;
 };
 
+/** @param {boolean} running */
 const setRunning = (running) => {
   startButton.hidden = running;
   stopButton.hidden = !running;
@@ -33,14 +45,14 @@ const setRunning = (running) => {
 async function startAgent() {
   if (session) return;
   setRunning(true);
-  setStatus("Verbindung wird hergestellt …", "connecting");
+  setStatus("Mikrofon wird angefragt …", "connecting");
   transcript.replaceChildren();
 
   try {
     session = new AgentSession({
       auth: {
         tokenFactory: async () => {
-          const response = await fetch("/api/deepgram-token", { cache: "no-store" });
+          const response = await fetch("/api/deepgram-token", { method: "POST", cache: "no-store" });
           if (!response.ok) throw new Error(await response.text());
           return response.text();
         },
@@ -67,7 +79,7 @@ async function startAgent() {
     });
 
     player = new AgentPlayer({ sampleRate: 24000 });
-    microphone = new AgentMicrophone((audio) => session.sendAudio(audio), {
+    microphone = new AgentMicrophone((audio) => session?.sendAudio(audio), {
       sampleRate: 16000,
       echoCancellation: true,
       noiseSuppression: true,
@@ -77,8 +89,8 @@ async function startAgent() {
     session.on("connected", () => setStatus("Verbunden – Sie können sprechen.", "connected"));
     session.on("reconnecting", () => setStatus("Verbindung wird wiederhergestellt …", "connecting"));
     session.on("disconnected", () => setStatus("Verbindung beendet.", "idle"));
-    session.on("audio", (chunk) => player.queue(chunk));
-    session.on("user-started-speaking", () => player.interrupt());
+    session.on("audio", (chunk) => player?.queue(chunk));
+    session.on("user-started-speaking", () => player?.interrupt());
     session.on("agent-thinking", () => setStatus("Ich denke kurz nach …", "thinking"));
     session.on("agent-started-speaking", () => setStatus("Der Assistent spricht …", "speaking"));
     session.on("conversation-text", (message) => {
@@ -89,11 +101,13 @@ async function startAgent() {
     session.on("warning", (message) => console.warn("Deepgram warning", message));
     session.on("sdk-error", (error) => setStatus(error.message || "Sprachverbindung fehlgeschlagen.", "error"));
 
-    await session.connect();
     await microphone.start();
+    setStatus("Verbindung wird hergestellt …", "connecting");
+    await session.connect();
   } catch (error) {
     console.error(error);
-    setStatus(error.message || "Sprachassistent konnte nicht gestartet werden.", "error");
+    setStatus(error instanceof Error ? error.message : "Sprachassistent konnte nicht gestartet werden.", "error");
+    microphone?.stop();
     session?.disconnect();
     player?.dispose();
     session = undefined;

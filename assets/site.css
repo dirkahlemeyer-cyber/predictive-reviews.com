@@ -82,6 +82,7 @@ header { background: #fff; border-bottom: 1px solid var(--line); position: stick
 .voice-agent-card p { max-width: none; }
 .voice-agent-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 20px; }
 .voice-agent-actions .button { border: 0; cursor: pointer; font: inherit; }
+.voice-agent-actions button[hidden] { display: none; }
 .voice-agent-status { min-height: 1.6em; color: #d8eaff; font-weight: 700; }
 .voice-agent-status[data-state="error"] { color: #ffd0ca; }
 .voice-agent-status[data-state="speaking"] { color: #ffe3a1; }

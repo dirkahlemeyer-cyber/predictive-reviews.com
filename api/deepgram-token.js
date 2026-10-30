@@ -1,7 +1,19 @@
+/**
+ * @param {{ method?: string, headers?: { origin?: string, host?: string } }} req
+ * @param {{ setHeader: (name: string, value: string) => void, status: (code: number) => { send: (body: string) => void } }} res
+ */
 export default async function handler(req, res) {
-  if (req.method !== "GET") {
-    res.setHeader("Allow", "GET");
+  res.setHeader("Cache-Control", "no-store");
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
     return res.status(405).send("Method Not Allowed");
+  }
+
+  // This limits cross-site browser calls. Provider-side usage limits are
+  // still needed because the public endpoint can be called by other clients.
+  if (!req.headers?.origin || !req.headers?.host ||
+      req.headers.origin !== `https://${req.headers.host}`) {
+    return res.status(403).send("Forbidden");
   }
 
   const apiKey = process.env.DEEPGRAM_API_KEY;
@@ -25,11 +37,10 @@ export default async function handler(req, res) {
       return res.status(502).send("Deepgram-Token konnte nicht erstellt werden.");
     }
 
-    res.setHeader("Cache-Control", "no-store");
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
     return res.status(200).send(payload.access_token);
-  } catch (error) {
-    console.error("Deepgram token request failed", error);
+  } catch {
+    console.error("Deepgram token request failed");
     return res.status(502).send("Deepgram ist momentan nicht erreichbar.");
   }
 }

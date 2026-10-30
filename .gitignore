@@ -1,2 +1,4 @@
 .vercel
 zoho-backups/
+node_modules/
+public/

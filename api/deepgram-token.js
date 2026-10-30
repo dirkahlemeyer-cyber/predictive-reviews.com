@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
     const payload = await response.json();
     if (!response.ok || !payload.access_token) {
-      console.error("Deepgram token error", response.status, payload);
+      console.error("Deepgram token error", response.status, typeof payload?.err_code === "string" ? payload.err_code : "unknown");
       return res.status(502).send("Deepgram-Token konnte nicht erstellt werden.");
     }
 

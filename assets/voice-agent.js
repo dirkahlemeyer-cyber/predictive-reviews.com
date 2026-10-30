@@ -63,7 +63,6 @@ async function startAgent() {
       },
       reconnect: { enabled: true, maxAttempts: 4, baseDelay: 700, maxDelay: 8000, jitter: true },
       agent: {
-        language: "de",
         listen: {
           provider: { type: "deepgram", version: "v2", model: "flux-general-multi", language_hints: ["de"] },
         },

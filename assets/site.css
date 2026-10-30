@@ -75,3 +75,19 @@ header { background: #fff; border-bottom: 1px solid var(--line); position: stick
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+.voice-agent { background: #10233f; color: #fff; }
+.voice-agent .section { padding-bottom: 66px; }
+.voice-agent-card { max-width: 760px; margin: 28px auto 0; padding: 28px; border: 1px solid #ffffff33; border-radius: 16px; background: #ffffff12; box-shadow: 0 18px 40px #06132633; }
+.voice-agent-card p { max-width: none; }
+.voice-agent-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 20px; }
+.voice-agent-actions .button { border: 0; cursor: pointer; font: inherit; }
+.voice-agent-status { min-height: 1.6em; color: #d8eaff; font-weight: 700; }
+.voice-agent-status[data-state="error"] { color: #ffd0ca; }
+.voice-agent-status[data-state="speaking"] { color: #ffe3a1; }
+.voice-agent-status[data-state="connected"], .voice-agent-status[data-state="listening"] { color: #b9f4d0; }
+.voice-transcript { display: none; max-height: 180px; overflow: auto; margin-top: 22px; padding: 14px 16px; border-radius: 10px; background: #081a32; color: #eaf4ff; }
+.voice-agent-card.is-active .voice-transcript { display: block; }
+.voice-line { margin: 6px 0; }
+.voice-line--assistant strong { color: #f4b942; }
+.voice-line--user strong { color: #a8d6ff; }

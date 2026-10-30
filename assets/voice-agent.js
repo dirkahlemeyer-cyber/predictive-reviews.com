@@ -53,14 +53,14 @@ async function startAgent() {
       agent: {
         language: "de",
         listen: {
-          provider: { type: "deepgram", version: "v2", model: "flux-general-multi", language_hint: ["de"] },
+          provider: { type: "deepgram", version: "v2", model: "flux-general-multi", language_hints: ["de"] },
         },
         think: {
           provider: { type: "open_ai", model: "gpt-4o-mini", temperature: 0.4 },
           prompt: "Du bist der freundliche Sprachassistent von Predictive Reviews. Sprich auf Deutsch, kurz und natürlich. Erkläre das Bewertungsmanagement, beantworte Fragen zu Leistungen und Ablauf und biete bei konkreten Anliegen ein Erstgespräch an. Behaupte keine garantierten Sterne, gekauften Bewertungen oder Ergebnisse. Wenn du etwas nicht weißt, sage das offen und verweise auf info@predictive-reviews.com oder +49 160 3773509.",
         },
         speak: {
-          provider: { type: "deepgram", version: "v2", model: "flux-2-camelia-de" },
+          provider: { type: "deepgram", version: "v2", model: "flux-janine-de" },
         },
         greeting: "Guten Tag! Ich bin der Sprachassistent von Predictive Reviews. Wie kann ich Ihnen helfen?",
       },
